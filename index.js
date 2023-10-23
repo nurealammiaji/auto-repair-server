@@ -56,7 +56,7 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const options = {
-        projection: { _id: 0, title: 1, service_id: 1 },
+        projection: { _id: 0, title: 1, service_id: 1, price: 1, img: 1 },
       };
       const result = await serviceCollection.findOne(query, options);
       res.send(result);
@@ -68,6 +68,12 @@ async function run() {
       res.send(result);
     })
 
+    app.get("/bookings", async (req, res) => {
+      const cursor = bookingCollection.find();
+      const result = await cursor.toArray();
+      console.log(result);
+      res.send(result);
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
