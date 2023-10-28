@@ -21,6 +21,12 @@ app.listen(port, () => {
   console.log(`Auto Repair Server running on port: ${port}`);
 })
 
+const verifyJWT = (req, res, next) => {
+    const authorization = req.headers.authorization;
+    const token = authorization.split(' ')[1];
+    console.log("Token:", token);
+}
+
 const uri = `mongodb+srv://${username}:${password}@cluster0.31s3qjy.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -44,9 +50,8 @@ async function run() {
     // JWT
     app.post("/jwt", (req, res) => {
       const user = req.body;
-      console.log(user);
       const token = jwt.sign(user, secret, { expiresIn: '1h' });
-      res.send({token});
+      res.send({ token });
     })
 
     app.get("/services", async (req, res) => {
@@ -72,7 +77,8 @@ async function run() {
       res.send(result);
     })
 
-    app.get("/bookings", async (req, res) => {
+    app.get("/bookings", verifyJWT, async (req, res) => {
+      console.log(req.headers);
       let query = {};
       if (req.query?.uid) {
         query = { customerID: req.query.uid }
