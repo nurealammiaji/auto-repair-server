@@ -23,8 +23,17 @@ app.listen(port, () => {
 
 const verifyJWT = (req, res, next) => {
     const authorization = req.headers.authorization;
+    if (!authorization) {
+      res.status(401).send({error: true, message: 'Unauthorized Access'})
+    }
     const token = authorization.split(' ')[1];
-    console.log("Token:", token);
+    jwt.verify(token, secret, (error, decoded) => {
+      if (error) {
+        return res.status(403).send({error: true, message: 'Unauthorized Access'});
+      }
+      req.decoded = decoded;
+      next();
+    })
 }
 
 const uri = `mongodb+srv://${username}:${password}@cluster0.31s3qjy.mongodb.net/?retryWrites=true&w=majority`;
