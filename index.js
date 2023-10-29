@@ -87,8 +87,11 @@ async function run() {
     })
 
     app.get("/bookings", verifyJWT, async (req, res) => {
-      console.log(req.headers);
+      console.log(req.decoded);
       let query = {};
+      if (req.decoded.uid !== req.query.uid) {
+        return res.status(403).send({error: 1, message: "Forbidden Access"})
+      }
       if (req.query?.uid) {
         query = { customerID: req.query.uid }
       }
@@ -123,8 +126,6 @@ async function run() {
       res.send(result);
       console.log(result);
     })
-
-
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
